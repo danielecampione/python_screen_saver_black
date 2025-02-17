@@ -1,40 +1,30 @@
-import pygame
-import sys
+import tkinter as tk
 
-# Inizializza Pygame
-pygame.init()
+def exit_screensaver(event=None):
+    root.destroy()
 
-# Imposta la finestra a schermo intero
-schermo = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+root = tk.Tk()
+root.attributes('-fullscreen', True)
+root.configure(bg='black')
 
 # Nasconde il puntatore del mouse
-pygame.mouse.set_visible(False)
-
-# Riempi lo schermo con il colore nero (RGB: 0, 0, 0)
-schermo.fill((0, 0, 0))
-pygame.display.flip()
+root.config(cursor='none')
 
 # Posizione iniziale del puntatore
-posizione_iniziale = pygame.mouse.get_pos()
+posizione_iniziale = root.winfo_pointerx(), root.winfo_pointery()
 
-# Loop principale
-while True:
-    for evento in pygame.event.get():
-        if evento.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif evento.type == pygame.KEYDOWN:
-            if evento.key == pygame.K_ESCAPE:
-                pygame.quit()
-                sys.exit()
-                
-    # Ottieni la posizione attuale del puntatore del mouse
-    posizione_attuale = pygame.mouse.get_pos()
-    
-    # Calcola lo spostamento del puntatore
+def controllo_movimento():
+    posizione_attuale = root.winfo_pointerx(), root.winfo_pointery()
     spostamento = ((posizione_attuale[0] - posizione_iniziale[0]) ** 2 + (posizione_attuale[1] - posizione_iniziale[1]) ** 2) ** 0.5
-    
-    # Se lo spostamento è superiore a 5 pixel, chiudi l'applicazione
     if spostamento > 5:
-        pygame.quit()
-        sys.exit()
+        exit_screensaver()
+    else:
+        root.after(100, controllo_movimento)
+
+# Vincola gli eventi per uscire
+root.bind('<Escape>', exit_screensaver)
+root.bind('<Button>', exit_screensaver)
+root.bind('<Motion>', lambda e: None)  # Previene il blocco del movimento del mouse
+
+controllo_movimento()
+root.mainloop()
